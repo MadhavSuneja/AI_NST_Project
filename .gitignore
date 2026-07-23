@@ -1,0 +1,18 @@
+# Dataset
+dataset/
+
+# Python cache
+__pycache__/
+
+# Virtual environment
+venv/
+
+# Training outputs
+experiment/
+
+# Flask generated images
+static/uploads/*
+!static/uploads/.gitkeep
+
+static/results/*
+!static/results/.gitkeep
