@@ -1,5 +1,6 @@
 import os
 import torch
+import gc
 import time
 from flask import Flask,render_template,send_from_directory
 from flask_wtf import FlaskForm
@@ -51,12 +52,12 @@ def allowed_file(filename):
 
 def style_transfer(content_image, style_image, alpha, encoder, decoder, device):
     content_transform=transforms.Compose([
-        transforms.Resize((256,256)),
+        transforms.Resize((128,128)),
         transforms.ToTensor()
     ])
 
     style_transform=transforms.Compose([
-        transforms.Resize((256,256)),
+        transforms.Resize((128,128)),
         transforms.ToTensor()
 
     ])
@@ -67,8 +68,6 @@ def style_transfer(content_image, style_image, alpha, encoder, decoder, device):
     with torch.no_grad():
         content_feats=encoder(content_image,is_test=True)
         style_feats=encoder(style_image,is_test=True)
-        print(type(content_feats))
-        print(type(style_feats))
 
         if hasattr(content_feats, "shape"):
             print(content_feats.shape)
@@ -79,6 +78,14 @@ def style_transfer(content_image, style_image, alpha, encoder, decoder, device):
         stylized_feats = adaptive_instance_normalization(content_feats, style_feats)
         stylized_feats = alpha * stylized_feats + (1 - alpha) * content_feats
         stylized_image = decoder(stylized_feats)
+        del content_image
+        del style_image
+        del content_feats
+        del style_feats
+        del stylized_feats
+        gc.collect()
+
+
     return stylized_image.cpu()
     
  
